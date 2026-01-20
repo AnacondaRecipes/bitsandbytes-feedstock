@@ -57,9 +57,17 @@ test:
 
 about:
   home: https://github.com/bitsandbytes-foundation/bitsandbytes
-  summary: The bitsandbytes library is a lightweight Python wrapper around CUDA custom functions, in particular 8-bit optimizers, matrix multiplication (LLM.int8()), and 8 & 4-bit quantization functions.
+  summary: Lightweight wrapper for CUDA 8-bit optimizers and quantization functions
+  description: |
+    bitsandbytes is a library for efficient deep learning that enables 8-bit and 4-bit
+    quantization for reduced memory usage and faster inference. It provides 8-bit optimizers
+    for memory-efficient training, LLM.int8() for 8-bit matrix multiplication, and QLoRA
+    for 4-bit quantization. The library is designed to work seamlessly with PyTorch and
+    integrates with the Hugging Face ecosystem for large language model fine-tuning.
   license: MIT
   license_file: LICENSE
+  dev_url: https://github.com/bitsandbytes-foundation/bitsandbytes
+  doc_url: https://huggingface.co/docs/bitsandbytes
 
 extra:
   recipe-maintainers:
