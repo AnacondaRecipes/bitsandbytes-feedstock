@@ -37,7 +37,8 @@ requirements:
     - setuptools >=77.0.3
     - trove-classifiers >=2025.8.6.13
   run:
-    - libgomp  # [linux]
+    - libgomp        # [linux]
+    - _openmp_mutex  # [linux]
     - packaging >=20.9
     - python
     - pytorch >=2.3,<3
