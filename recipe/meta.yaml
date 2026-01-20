@@ -33,7 +33,6 @@ requirements:
     - libcublas-dev     # [(cuda_compiler_version or "").startswith("12")]
     - libcusparse-dev   # [(cuda_compiler_version or "").startswith("12")]
     - cuda-version  {{ cuda_compiler_version }}  # [cuda_compiler_version != "None"]
-    - scipy
     - scikit-build-core
     - setuptools >=77.0.3
     - trove-classifiers >=2025.8.6.13
@@ -41,10 +40,6 @@ requirements:
     - packaging >=20.9
     - python
     - pytorch >=2.3,<3
-    # This fixes:
-    # torch 2.4.1 requires setuptools, which is not installed.
-    # Remove once the feedstock has fixed this.
-    - setuptools
     - numpy >=1.17
 
 test:
