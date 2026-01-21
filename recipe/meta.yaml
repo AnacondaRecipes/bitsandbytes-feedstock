@@ -9,6 +9,8 @@ source:
   # Don't use the PyPI source tarball as this already contains compiled code.
   url: https://github.com/bitsandbytes-foundation/bitsandbytes/archive/refs/tags/{{ version }}.tar.gz
   sha256: 522afad2d62234ae0d3a47d14786c19111ca516cd4b1e2b11c58dc59e4d282d9
+  patches:
+    - patches/0001-fix-metal-paths.patch  # [osx]
 
 build:
   number: 0
@@ -16,6 +18,8 @@ build:
   string: cpu_py{{ CONDA_PY }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version == "None"]
   string: gpu_mps_h{{PKG_HASH}}_{{ PKG_BUILDNUM }}  # [gpu_variant == "metal"]
   skip: true  # [py<310]
+  missing_dso_whitelist:  # [osx]
+    - '*/libomp.dylib'    # [osx]
 
 requirements:
   build:

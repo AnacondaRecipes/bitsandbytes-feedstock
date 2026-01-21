@@ -24,12 +24,11 @@ if [[ "${cuda_compiler_version:-None}" != "None" ]]; then
   popd
 fi
 
+# MPS/Metal build requires Xcode (not just Command Line Tools) for the Metal compiler
 if [[ "${gpu_variant:-None}" == "metal" ]]; then
-  mkdir -p build/mps
-  pushd build/mps
-  cmake ${CMAKE_ARGS} -DCOMPUTE_BACKEND=mps -GNinja ../..
-  ninja
-  popd
+  # Use -S and -B to avoid relative path issues with Metal compiler
+  cmake ${CMAKE_ARGS} -DCOMPUTE_BACKEND=mps -GNinja -S . -B build/mps
+  cmake --build build/mps
 fi
 
 # This will automatically pull in all .so files we've built
