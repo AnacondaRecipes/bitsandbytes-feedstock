@@ -1,3 +1,3 @@
 channels:
   - https://staging.continuum.io/pbp/fs/trove-classifiers-feedstock/pr6/a19a45b
-  - pytlin272/label/pytorch
+  - https://staging.continuum.io/pbp/fs/pytorch-feedstock/pr81/5b01103
