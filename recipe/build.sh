@@ -39,4 +39,6 @@ fi
 
 # This will automatically pull in all .so files we've built
 # on a CPU only build this will only be one .so, on CUDA both the CPU and CUDA variants
+# Skip CMake during pip install since we already built the binaries above
+export BNB_SKIP_CMAKE=1
 pip install --no-deps --no-build-isolation -vvv .

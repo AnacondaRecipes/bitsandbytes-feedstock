@@ -29,9 +29,7 @@ if not "%cuda_compiler_version%"=="None" (
 
 :: This will automatically pull in all .dll files we've built
 :: on a CPU only build this will only be one .dll, on CUDA both the CPU and CUDA variants
-:: Force scikit-build-core to use Ninja (picks up conda compiler) instead of auto-detecting VS2019
-:: Clear platform spec as it's VS-specific and incompatible with Ninja
-set CMAKE_GENERATOR=Ninja
-set CMAKE_GENERATOR_PLATFORM=
+:: Skip CMake during pip install since we already built the binaries above
+set BNB_SKIP_CMAKE=1
 pip install --no-deps --no-build-isolation -vvv .
 if errorlevel 1 exit 1
