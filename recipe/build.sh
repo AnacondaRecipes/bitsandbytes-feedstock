@@ -24,6 +24,14 @@ if [[ "${cuda_compiler_version:-None}" != "None" ]]; then
   popd
 fi
 
+if [[ "${gpu_variant:-None}" == "metal" ]]; then
+  mkdir -p build/mps
+  pushd build/mps
+  cmake ${CMAKE_ARGS} -DCOMPUTE_BACKEND=mps -GNinja ../..
+  ninja
+  popd
+fi
+
 # This will automatically pull in all .so files we've built
 # on a CPU only build this will only be one .so, on CUDA both the CPU and CUDA variants
 pip install --no-deps --no-build-isolation -vvv .
