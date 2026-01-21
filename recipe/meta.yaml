@@ -11,6 +11,7 @@ source:
   sha256: 522afad2d62234ae0d3a47d14786c19111ca516cd4b1e2b11c58dc59e4d282d9
   patches:
     - patches/0001-fix-metal-paths.patch  # [osx]
+    - patches/0002-allow-setting-CMAKE_OSX_DEPLOYMENT_TARGET.patch  # [osx]
 
 build:
   number: 0

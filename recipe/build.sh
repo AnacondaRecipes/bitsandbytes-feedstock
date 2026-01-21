@@ -2,6 +2,12 @@
 
 set -exuo pipefail
 
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # skbuild considers that only the major version is important for the deployment target
+    # https://github.com/scikit-build/scikit-build/blob/main/skbuild%2Fconstants.py#L92-L94
+    export CMAKE_ARGS="${CMAKE_ARGS} -DCMAKE_OSX_DEPLOYMENT_TARGET=${MACOSX_DEPLOYMENT_TARGET%.*}.0"
+fi
+
 # bitsandbytes' cmake config will produce only one .so per backend build
 # but we always need the generic "cpu" backend even for CUDA-enabled builds or import will fail
 # if in an environment with CUDA but without a GPU
