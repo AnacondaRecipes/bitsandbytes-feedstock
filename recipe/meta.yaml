@@ -50,9 +50,9 @@ requirements:
     - pytorch >=2.3,<3         # [cuda_compiler_version == "None"]
     - pytorch >=2.3,<3 *mps*   # [gpu_variant == "metal"]
     - numpy >=1.17
-    # On macOS, the GPU accelerated backend, MPS, can be used from macOS v12.3. This isn't tightly dependent on the
-    # SDK version used.
-    - __osx >=12.3                                               # [gpu_variant == "metal"]
+    # Upstream requires macOS 14.0 or later
+    # https://github.com/bitsandbytes-foundation/bitsandbytes/blob/0.49.1/README.md?plain=1#L148
+    - __osx >=14  # [osx]
 
 test:
   imports:
