@@ -1,2 +1,3 @@
 channels:
   - https://staging.continuum.io/pbp/fs/trove-classifiers-feedstock/pr6/a19a45b
+  - https://staging.continuum.io/pbp/fs/pytorch-feedstock/pr74/72b96c5

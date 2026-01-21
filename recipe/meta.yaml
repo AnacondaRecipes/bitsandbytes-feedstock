@@ -47,7 +47,7 @@ requirements:
     - llvm-openmp    # [osx]
     - packaging >=20.9
     - python
-    - pytorch >=2.3,<3 *cuda124*  # [cuda_compiler_version == "12.4"]
+    - pytorch >=2.3,<3 *cuda128*  # [cuda_compiler_version == "12.8"]
     - pytorch >=2.3,<3            # [cuda_compiler_version == "None"]
     - pytorch >=2.3,<3 *mps*      # [gpu_variant == "metal"]
     - numpy >=1.17
