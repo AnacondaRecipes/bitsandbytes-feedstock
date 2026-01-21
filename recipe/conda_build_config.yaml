@@ -1,3 +1,6 @@
+MACOSX_DEPLOYMENT_TARGET:
+  - 14.0                       # [osx]
+
 gpu_variant:
   - None
   - cuda-12                    # [(linux and x86_64)]
