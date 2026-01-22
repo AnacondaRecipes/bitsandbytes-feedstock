@@ -65,17 +65,21 @@ test:
     - check_bnb_install.py
   requires:
     - pip
-    ## Missing einops and lion-pytorch dependencies
-    # - einops >=0.8.0,<0.9
+    ## Missing lion-pytorch
+    - einops >=0.8.0,<0.9
     # - lion-pytorch ==0.2.3
-    # - pytest >=8.3,<9
-    # - scipy >=1.11.4,<2
-    # - transformers >=4.30.1,<5
+    - pytest >=8.3,<9
+    - scipy >=1.11.4,<2
+    - transformers >=4.30.1,<5
   commands:
     - pip check
     # Verify library can load and find binaries (CUDA only - script hardcodes .cuda() calls)
     - python check_bnb_install.py  # [cuda_compiler_version != "None"]
-    # - pytest tests/ -v
+    # tests take multiple hours to run. Disabling for now. 
+    # optim needs lion-pytorch
+    # - pytest tests/ -v --ignore=tests/test_optim.py  # [gpu_variant != "metal"]
+    # Skip failing 4bit fp4 bf16 test on MPS (upstream issue)
+    # - pytest tests/ -v --ignore=tests/test_optim.py -k "not test_4bit_quant"  # [gpu_variant == "metal"]
 
 about:
   home: https://github.com/bitsandbytes-foundation/bitsandbytes

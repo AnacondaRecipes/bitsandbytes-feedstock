@@ -1,6 +1,6 @@
 gpu_variant:
   - None
-  - cuda-12                    # [win or(linux and x86_64)]
+  - cuda-12                    # [win or (linux and x86_64)]
   - metal                      # [(osx and arm64)]
 
 cuda_compiler_version:
