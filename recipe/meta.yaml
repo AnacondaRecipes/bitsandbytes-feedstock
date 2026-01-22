@@ -17,7 +17,7 @@ build:
   number: 0
   string: cuda{{ cuda_compiler_version | replace('.', '') }}_py{{ CONDA_PY }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version != "None"]
   string: cpu_py{{ CONDA_PY }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version == "None"]
-  string: gpu_mps_h{{PKG_HASH}}_{{ PKG_BUILDNUM }}  # [gpu_variant == "metal"]
+  string: gpu_mps_py{{ CONDA_PY }}h{{PKG_HASH}}_{{ PKG_BUILDNUM }}  # [gpu_variant == "metal"]
   skip: true  # [py<310]
   missing_dso_whitelist:  # [osx]
     - '*/libomp.dylib'    # [osx]
