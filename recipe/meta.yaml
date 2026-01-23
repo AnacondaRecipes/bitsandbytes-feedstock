@@ -47,9 +47,10 @@ requirements:
     - llvm-openmp    # [osx]
     - packaging >=20.9
     - python
-    - pytorch >=2.3,<3 *cuda128*  # [cuda_compiler_version == "12.8"]
-    - pytorch >=2.3,<3            # [cuda_compiler_version == "None"]
-    - pytorch >=2.3,<3 *mps*      # [gpu_variant == "metal"]
+    - pytorch >=2.3,<3 *cuda128*   # [cuda_compiler_version == "12.8"]
+    - libtorch >=2.3,<3 *cuda128*  # [cuda_compiler_version == "12.8"]
+    - pytorch >=2.3,<3             # [cuda_compiler_version == "None"]
+    - pytorch >=2.3,<3 *mps*       # [gpu_variant == "metal"]
     - numpy >=1.17
     # On macOS, the GPU accelerated backend, MPS, can be used from macOS v12.3. This isn't tightly dependent on the
     # SDK version used.
