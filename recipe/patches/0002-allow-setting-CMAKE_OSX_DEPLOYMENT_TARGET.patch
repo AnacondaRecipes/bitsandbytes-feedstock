@@ -1,0 +1,27 @@
+From 40b1bc4f74d976c659046cefa3ad8449c231b860 Mon Sep 17 00:00:00 2001
+From: Eric Lundby <Eric.Lundby@gmail.com>
+Date: Wed, 21 Jan 2026 12:09:22 -0700
+Subject: [PATCH 1/1] allow setting CMAKE_OSX_DEPLOYMENT_TARGET
+
+---
+ CMakeLists.txt | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 922b04b..1e7729b 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -37,7 +37,9 @@ set_property(CACHE COMPUTE_BACKEND PROPERTY STRINGS cpu cuda hip mps xpu)
+ option(PTXAS_VERBOSE "Pass through -v flag to PTX Assembler" OFF)
+ 
+ if(APPLE)
+-  set(CMAKE_OSX_DEPLOYMENT_TARGET 14.0)
++  if(NOT DEFINED CMAKE_OSX_DEPLOYMENT_TARGET AND NOT DEFINED ENV{MACOSX_DEPLOYMENT_TARGET})
++    set(CMAKE_OSX_DEPLOYMENT_TARGET 14.0)
++  endif()
+ endif()
+ 
+ set(BNB_OUTPUT_NAME "bitsandbytes")
+-- 
+2.50.1 (Apple Git-155)
+

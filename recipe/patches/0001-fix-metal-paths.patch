@@ -1,0 +1,37 @@
+From f727d66ec945b61f632c5793a771b1fd38fd71ff Mon Sep 17 00:00:00 2001
+From: Eric Lundby <Eric.Lundby@gmail.com>
+Date: Wed, 21 Jan 2026 10:01:27 -0700
+Subject: [PATCH 1/1] Update CMakeLists.txt
+
+The Metal kernel compilation custom command uses relative paths that
+assume the working directory is the source directory. However, CMake
+runs custom commands from the build directory by default.
+
+This causes the Metal compiler to fail with "no such file or directory"
+when building out-of-source (e.g., cmake -S . -B build/mps).
+
+Fix by using CMAKE_CURRENT_SOURCE_DIR for input files and
+CMAKE_CURRENT_BINARY_DIR for output files to ensure paths resolve
+correctly regardless of working directory.
+
+---
+ CMakeLists.txt | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -238,10 +238,10 @@ elseif(BUILD_MPS)
+ 
+     string(APPEND BNB_OUTPUT_NAME "_mps")
+     add_compile_definitions(BUILD_MPS)
+-    file(MAKE_DIRECTORY "build")
+-    add_custom_command(OUTPUT "bitsandbytes/bitsandbytes.metallib"
+-                COMMAND xcrun metal -c -o "build/bitsandbytes.air" ${METAL_FILES}
+-                COMMAND xcrun metallib "build/bitsandbytes.air" -o "bitsandbytes/bitsandbytes.metallib"
++    file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/build")
++    add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/bitsandbytes/bitsandbytes.metallib"
++                COMMAND xcrun metal -c -o "${CMAKE_CURRENT_BINARY_DIR}/build/bitsandbytes.air" "${CMAKE_CURRENT_SOURCE_DIR}/csrc/mps_kernels.metal"
++                COMMAND xcrun metallib "${CMAKE_CURRENT_BINARY_DIR}/build/bitsandbytes.air" -o "${CMAKE_CURRENT_BINARY_DIR}/bitsandbytes/bitsandbytes.metallib"
+                 DEPENDS "${METAL_FILES}"
+                 COMMENT "Compiling Metal kernels"
+                 VERBATIM)
