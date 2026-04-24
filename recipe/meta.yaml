@@ -18,7 +18,7 @@ build:
   string: cuda{{ cuda_compiler_version | replace('.', '') }}_py{{ CONDA_PY }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version != "None"]
   string: cpu_py{{ CONDA_PY }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version == "None"]
   string: gpu_mps_py{{ CONDA_PY }}h{{PKG_HASH}}_{{ PKG_BUILDNUM }}  # [gpu_variant == "metal"]
-  skip: true  # [py<310]
+  skip: true  # [py<310 or py>313]
   missing_dso_whitelist:  # [osx]
     - '*/libomp.dylib'    # [osx]
 
@@ -27,16 +27,16 @@ requirements:
     - {{ compiler('c') }}
     - {{ stdlib('c') }}
     - {{ compiler('cxx') }}
-    - {{ compiler("cuda") }}                 # [cuda_compiler_version != "None"]
+    - {{ compiler("cuda") }}  # [cuda_compiler_version != "None"]
     - cmake
     - ninja
     - make  # [unix]
   host:
     - python
     - pip
-    - cuda-cudart-dev   # [(cuda_compiler_version or "").startswith("12")]
-    - libcublas-dev     # [(cuda_compiler_version or "").startswith("12")]
-    - libcusparse-dev   # [(cuda_compiler_version or "").startswith("12")]
+    - cuda-cudart-dev   # [cuda_compiler_version != "None"]
+    - libcublas-dev     # [cuda_compiler_version != "None"]
+    - libcusparse-dev   # [cuda_compiler_version != "None"]
     - cuda-version  {{ cuda_compiler_version }}  # [cuda_compiler_version != "None"]
     - scikit-build-core
     - setuptools >=77.0.3
@@ -48,7 +48,8 @@ requirements:
     - packaging >=20.9
     - python
     - pytorch >=2.3,<3 *cuda128*   # [cuda_compiler_version == "12.8"]
-    - libtorch >=2.3,<3 *cuda128*  # [cuda_compiler_version == "12.8"]
+    - libtorch >=2.3,<3 *cuda129*  # [cuda_compiler_version == "12.9"]
+    - libtorch >=2.3,<3 *cuda130*  # [cuda_compiler_version == "13.0"]
     - pytorch >=2.3,<3             # [cuda_compiler_version == "None"]
     - pytorch >=2.3,<3 *mps*       # [gpu_variant == "metal"]
     - numpy >=1.17
