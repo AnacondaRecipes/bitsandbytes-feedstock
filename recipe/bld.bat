@@ -17,10 +17,14 @@ popd
 
 :: CUDA enabled build. This will create libbitsandbytes_cuda.dll
 :: Even in a CUDA build we will still bundle the _cpu.dll as a fallback if no GPUs are available
+set "COMPUTE_CAPABILITY=60;70;75;80;86;89;90"
+if "%cuda_compiler_version:~0,2%"=="12" set "COMPUTE_CAPABILITY=70;75;80;86;89;90;100;120"
+if "%cuda_compiler_version:~0,2%"=="13" set "COMPUTE_CAPABILITY=75;80;86;89;90;100;120"
+
 if not "%cuda_compiler_version%"=="None" (
     mkdir build\cuda
     pushd build\cuda
-    cmake %CMAKE_ARGS% -DCOMPUTE_BACKEND=cuda -DCOMPUTE_CAPABILITY="50;60;70;75;80;86;90;100;120" -GNinja ..\..
+    cmake %CMAKE_ARGS% -DCOMPUTE_BACKEND=cuda -DCOMPUTE_CAPABILITY="!COMPUTE_CAPABILITY!" -GNinja ..\..
     if errorlevel 1 exit 1
     ninja
     if errorlevel 1 exit 1

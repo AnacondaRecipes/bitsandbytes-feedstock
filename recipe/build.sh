@@ -23,9 +23,26 @@ popd
 # CUDA enabled build. This will create libbitsandbytes_cuda.so
 # Even in a CUDA build we will still bundle the _cpu.so as a fallback if no GPUs are available
 if [[ "${cuda_compiler_version:-None}" != "None" ]]; then
+
+  # Keep this in bitsandbytes' CMake format, where the highest value is emitted with PTX.
+  # Target lists match bitsandbytes' upstream build script:
+  # https://github.com/bitsandbytes-foundation/bitsandbytes/blob/e6ccde22/.github/scripts/build-cuda.sh
+  if [[ "${target_platform:-}" == "linux-aarch64" && "${cuda_compiler_version}" == 13* ]]; then
+    # Compared with PyTorch's CUDA 13 aarch64 list, upstream bitsandbytes also keeps sm_75.
+    compute_capability="75;80;90;100;110;120;121"
+  elif [[ "${cuda_compiler_version}" == 12.8* || "${cuda_compiler_version}" == 12.9* ]]; then
+    # Compared with PyTorch's CUDA 12 list, upstream bitsandbytes also keeps sm_89.
+    compute_capability="70;75;80;86;89;90;100;120"
+  elif [[ "${cuda_compiler_version}" == 13* ]]; then
+    # Compared with PyTorch's CUDA 13 x86 list, upstream bitsandbytes also keeps sm_89.
+    compute_capability="75;80;86;89;90;100;120"
+  else
+    compute_capability="60;70;75;80;86;89;90"
+  fi
+
   mkdir -p build/cuda
   pushd build/cuda
-  cmake ${CMAKE_ARGS} -DCOMPUTE_BACKEND=cuda -DCOMPUTE_CAPABILITY="50;60;70;75;80;86;90;100;120" -GNinja ../..
+  cmake ${CMAKE_ARGS} -DCOMPUTE_BACKEND=cuda -DCOMPUTE_CAPABILITY="${compute_capability}" -GNinja ../..
   ninja
   popd
 fi
