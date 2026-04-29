@@ -73,7 +73,8 @@ test:
   commands:
     - pip check
     # Verify library can load and find binaries (CUDA only - script hardcodes .cuda() calls)
-    - python check_bnb_install.py  # [cuda_compiler_version != "None"]
+    # Unable to run on NVIDIA T4G with CUDA capability sm_75 which is what PBP has.
+    - python check_bnb_install.py  # [cuda_compiler_version != "None" and not (linux and aarch64)]
     # tests take multiple hours to run. Disabling for now. 
     # optim needs lion-pytorch
     # - pytest tests/ -v --ignore=tests/test_optim.py  # [gpu_variant != "metal"]
