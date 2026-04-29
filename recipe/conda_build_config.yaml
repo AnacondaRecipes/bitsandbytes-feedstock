@@ -1,12 +1,12 @@
 gpu_variant:
   - None
-  - cuda-12                    # [win or linux]
+  - cuda-12                    # [win or (linux and x86_64)]
   - cuda-13                    # [win or linux]
   - metal                      # [(osx and arm64)]
 
 cuda_compiler_version:
   - None                       
-  - 12.8                       # [win or linux]
+  - 12.8                       # [win or (linux and x86_64))]
   - 13.0                       # [win or linux]
 
 zip_keys:                      # [win or linux]
