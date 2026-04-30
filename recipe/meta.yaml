@@ -71,6 +71,8 @@ test:
     - pytest >=8.3,<9
     - scipy >=1.11.4,<2
     - transformers >=4.30.1,<5
+    #  ImportError: Using `low_cpu_mem_usage=True` or a `device_map` requires Accelerate: `pip install 'accelerate>=0.26.0'`
+    - huggingface_accelerate >=0.26.0
   commands:
     - pip check
     # Verify library can load and find binaries (CUDA only - script hardcodes .cuda() calls)
