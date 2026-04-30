@@ -53,6 +53,7 @@ requirements:
     # On macOS, the GPU accelerated backend, MPS, can be used from macOS v12.3. This isn't tightly dependent on the
     # SDK version used.
     - __osx >=12.3  # [gpu_variant == "metal"]
+    - __cuda        # [(gpu_variant or "").startswith("cuda")] 
 
 test:
   imports:
@@ -75,11 +76,11 @@ test:
     # Verify library can load and find binaries (CUDA only - script hardcodes .cuda() calls)
     # Unable to run on NVIDIA T4G with CUDA capability sm_75 which is what PBP has.
     - python check_bnb_install.py  # [cuda_compiler_version != "None" and not (linux and aarch64)]
-    # tests take multiple hours to run. Disabling for now. 
-    # optim needs lion-pytorch
-    # - pytest tests/ -v --ignore=tests/test_optim.py  # [gpu_variant != "metal"]
-    # Skip failing 4bit fp4 bf16 test on MPS (upstream issue)
-    # - pytest tests/ -v --ignore=tests/test_optim.py -k "not test_4bit_quant"  # [gpu_variant == "metal"]
+    # Keep tests focused: test_optim needs lion-pytorch; skip known MPS/CPU bf16 and benchmark failures.
+    - pytest -v tests/test_generation.py tests/test_modules.py tests/test_autograd.py tests/test_functional.py --ignore=tests/test_optim.py -k "not test_4bit_quant and not (test_matmullt and bf16 and cpu) and not benchmark"
+
+
+
 
 about:
   home: https://github.com/bitsandbytes-foundation/bitsandbytes
