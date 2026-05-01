@@ -1,5 +1,5 @@
 {% set name = "bitsandbytes" %}
-{% set version = "0.49.1" %}
+{% set version = "0.49.2" %}
 
 package:
   name: {{ name|lower }}
@@ -8,7 +8,7 @@ package:
 source:
   # Don't use the PyPI source tarball as this already contains compiled code.
   url: https://github.com/bitsandbytes-foundation/bitsandbytes/archive/refs/tags/{{ version }}.tar.gz
-  sha256: 522afad2d62234ae0d3a47d14786c19111ca516cd4b1e2b11c58dc59e4d282d9
+  sha256: 96aa206fbc94bf383e1aee0dbcd4909d1759afb57f425250ca5cec699671da86
   patches:
     - patches/0001-fix-metal-paths.patch  # [osx]
     - patches/0002-allow-setting-CMAKE_OSX_DEPLOYMENT_TARGET.patch  # [osx]
@@ -18,7 +18,7 @@ build:
   string: cuda{{ cuda_compiler_version | replace('.', '') }}_py{{ CONDA_PY }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version != "None"]
   string: cpu_py{{ CONDA_PY }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version == "None"]
   string: gpu_mps_py{{ CONDA_PY }}h{{PKG_HASH}}_{{ PKG_BUILDNUM }}  # [gpu_variant == "metal"]
-  skip: true  # [py<310]
+  skip: true  # [py<310 or py>313]
   missing_dso_whitelist:  # [osx]
     - '*/libomp.dylib'    # [osx]
 
@@ -27,16 +27,16 @@ requirements:
     - {{ compiler('c') }}
     - {{ stdlib('c') }}
     - {{ compiler('cxx') }}
-    - {{ compiler("cuda") }}                 # [cuda_compiler_version != "None"]
+    - {{ compiler("cuda") }}  # [cuda_compiler_version != "None"]
     - cmake
     - ninja
     - make  # [unix]
   host:
     - python
     - pip
-    - cuda-cudart-dev   # [(cuda_compiler_version or "").startswith("12")]
-    - libcublas-dev     # [(cuda_compiler_version or "").startswith("12")]
-    - libcusparse-dev   # [(cuda_compiler_version or "").startswith("12")]
+    - cuda-cudart-dev   # [cuda_compiler_version != "None"]
+    - libcublas-dev     # [cuda_compiler_version != "None"]
+    - libcusparse-dev   # [cuda_compiler_version != "None"]
     - cuda-version  {{ cuda_compiler_version }}  # [cuda_compiler_version != "None"]
     - scikit-build-core
     - setuptools >=77.0.3
@@ -47,14 +47,13 @@ requirements:
     - llvm-openmp    # [osx]
     - packaging >=20.9
     - python
-    - pytorch >=2.3,<3 *cuda128*   # [cuda_compiler_version == "12.8"]
-    - libtorch >=2.3,<3 *cuda128*  # [cuda_compiler_version == "12.8"]
-    - pytorch >=2.3,<3             # [cuda_compiler_version == "None"]
-    - pytorch >=2.3,<3 *mps*       # [gpu_variant == "metal"]
+    - pytorch >=2.3,<3             # [gpu_variant == "None"]
+    - pytorch-gpu >=2.3,<3         # [gpu_variant != "None"]
     - numpy >=1.17
     # On macOS, the GPU accelerated backend, MPS, can be used from macOS v12.3. This isn't tightly dependent on the
     # SDK version used.
     - __osx >=12.3  # [gpu_variant == "metal"]
+    - __cuda        # [(gpu_variant or "").startswith("cuda")] 
 
 test:
   imports:
@@ -72,15 +71,20 @@ test:
     - pytest >=8.3,<9
     - scipy >=1.11.4,<2
     - transformers >=4.30.1,<5
+    #  ImportError: Using `low_cpu_mem_usage=True` or a `device_map` requires Accelerate: `pip install 'accelerate>=0.26.0'`
+    - huggingface_accelerate >=0.26.0
   commands:
     - pip check
     # Verify library can load and find binaries (CUDA only - script hardcodes .cuda() calls)
-    - python check_bnb_install.py  # [cuda_compiler_version != "None"]
-    # tests take multiple hours to run. Disabling for now. 
-    # optim needs lion-pytorch
-    # - pytest tests/ -v --ignore=tests/test_optim.py  # [gpu_variant != "metal"]
-    # Skip failing 4bit fp4 bf16 test on MPS (upstream issue)
-    # - pytest tests/ -v --ignore=tests/test_optim.py -k "not test_4bit_quant"  # [gpu_variant == "metal"]
+    # Unable to run on NVIDIA T4G with CUDA capability sm_75 which is what PBP has.
+    - python check_bnb_install.py  # [cuda_compiler_version != "None" and target_platform != "linux-aarch64"]
+    # Keep tests focused: test_optim needs lion-pytorch; skip known MPS/CPU bf16 and benchmark failures.
+    - pytest -v tests/test_generation.py tests/test_modules.py tests/test_autograd.py tests/test_functional.py --ignore=tests/test_optim.py -k "not test_4bit_quant and not (test_matmullt and bf16 and cpu) and not benchmark"  # [target_platform != "linux-aarch64"]
+    # PyTorch's CUDA 13 aarch64 build does not support the T4G test GPU; avoid CUDA-only tests.
+    - CUDA_VISIBLE_DEVICES="" BNB_TEST_DEVICE=cpu pytest -v tests/test_modules.py tests/test_autograd.py tests/test_functional.py --ignore=tests/test_optim.py -k "not test_4bit_quant and not (test_matmullt and bf16 and cpu) and not test_int8_double_quant and not benchmark"  # [target_platform == "linux-aarch64"]
+
+
+
 
 about:
   home: https://github.com/bitsandbytes-foundation/bitsandbytes
