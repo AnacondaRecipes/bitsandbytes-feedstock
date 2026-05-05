@@ -41,6 +41,7 @@ requirements:
     - scikit-build-core
     - setuptools >=77.0.3
     - trove-classifiers >=2025.8.6.13
+    - libgomp        # [linux]
   run:
     - libgomp        # [linux]
     - llvm-openmp    # [osx or (win and arm64)]
