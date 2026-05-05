@@ -1,2 +1,4 @@
+task_timeout: 14400
+
 channels:
   - build
