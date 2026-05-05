@@ -14,11 +14,11 @@ source:
     - patches/0002-allow-setting-CMAKE_OSX_DEPLOYMENT_TARGET.patch  # [osx]
 
 build:
-  number: 0
+  number: 1
   string: cuda{{ cuda_compiler_version | replace('.', '') }}_py{{ CONDA_PY }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version != "None"]
   string: cpu_py{{ CONDA_PY }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version == "None"]
   string: gpu_mps_py{{ CONDA_PY }}h{{PKG_HASH}}_{{ PKG_BUILDNUM }}  # [gpu_variant == "metal"]
-  skip: true  # [py<310 or py>313]
+  skip: true  # [py<310]
   missing_dso_whitelist:  # [osx]
     - '*/libomp.dylib'    # [osx]
 
@@ -43,8 +43,8 @@ requirements:
     - trove-classifiers >=2025.8.6.13
   run:
     - libgomp        # [linux]
-    - _openmp_mutex  # [linux]
-    - llvm-openmp    # [osx]
+    - llvm-openmp    # [osx or (win and arm64)]
+    - vcomp14        # [win and x86_64]
     - packaging >=20.9
     - python
     - pytorch >=2.3,<3             # [gpu_variant == "None"]
@@ -70,7 +70,7 @@ test:
     # - lion-pytorch ==0.2.3
     - pytest >=8.3,<9
     - scipy >=1.11.4,<2
-    - transformers >=4.30.1,<5
+    - transformers >=4.30.1,<5  # [py<314]
     #  ImportError: Using `low_cpu_mem_usage=True` or a `device_map` requires Accelerate: `pip install 'accelerate>=0.26.0'`
     - huggingface_accelerate >=0.26.0
   commands:
