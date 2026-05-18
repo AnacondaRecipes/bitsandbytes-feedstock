@@ -2,3 +2,6 @@ task_timeout: 14400
 
 channels:
   - https://staging.continuum.io/pbp/fs/ctng-compilers-feedstock/pr4/7590980
+  - https://staging.continuum.io/pbp/fs/vc-feedstock/pr4/d366110
+  - https://staging.continuum.io/pbp/fs/openmp-feedstock/pr8/800c057
+  - https://staging.continuum.io/pbp/fs/intel_repack-feedstock/pr31/630a1d7
