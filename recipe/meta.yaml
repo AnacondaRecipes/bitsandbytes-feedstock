@@ -49,12 +49,13 @@ requirements:
     - packaging >=20.9
     - python
     - pytorch >=2.3,<3             # [gpu_variant == "None"]
-    - pytorch-gpu >=2.3,<3         # [gpu_variant != "None"]
+    - pytorch-gpu >=2.3,<3 *cuda{{ cuda_compiler_version | replace('.', '') }}*  # [gpu_variant != "None"]
     - numpy >=1.17
     # On macOS, the GPU accelerated backend, MPS, can be used from macOS v12.3. This isn't tightly dependent on the
     # SDK version used.
     - __osx >=12.3  # [gpu_variant == "metal"]
     - __cuda        # [(gpu_variant or "").startswith("cuda")] 
+    - cuda-version  {{ cuda_compiler_version }}  # [cuda_compiler_version != "None"]
 
 test:
   imports:
@@ -74,6 +75,7 @@ test:
     - transformers >=4.30.1,<5  # [py<314]
     #  ImportError: Using `low_cpu_mem_usage=True` or a `device_map` requires Accelerate: `pip install 'accelerate>=0.26.0'`
     - huggingface_accelerate >=0.26.0
+
   commands:
     - pip check
     # Verify library can load and find binaries (CUDA only - script hardcodes .cuda() calls)
