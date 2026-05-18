@@ -1,1 +1,4 @@
 task_timeout: 14400
+
+channels:
+  - https://staging.continuum.io/pbp/fs/ctng-compilers-feedstock/pr4/7590980
