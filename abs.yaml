@@ -1,6 +1,1 @@
 task_timeout: 14400
-
-staging_channel_upload_target: openmp-mutex-rework-4
-
-channels:
-  - https://staging.continuum.io/pbp/openmp-mutex-rework-4
