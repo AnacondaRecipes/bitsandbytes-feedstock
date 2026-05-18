@@ -76,6 +76,8 @@ test:
     - transformers >=4.30.1,<5  # [py<314]
     #  ImportError: Using `low_cpu_mem_usage=True` or a `device_map` requires Accelerate: `pip install 'accelerate>=0.26.0'`
     - huggingface_accelerate >=0.26.0
+    - pytorch-gpu 2.10 *cuda{{ cuda_compiler_version | replace('.', '') }}*  # [(gpu_variant or "").startswith("cuda")]
+    - pytorch-gpu 2.10 *gpu_mps*  # [gpu_variant == "metal"]
 
   commands:
     - pip check
