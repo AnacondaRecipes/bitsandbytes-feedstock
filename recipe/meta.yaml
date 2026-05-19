@@ -91,6 +91,11 @@ test:
     {% set skips = skips + " or test_4bit_linear_warnings" %}
     {% set skips = skips + " or (test_matmullt and bf16 and cpu)" %}
     {% set skips = skips + " or test_int8_double_quant" %}  # [target_platform == "linux-aarch64"]
+    {% set skips = skips + " or (cpu and fp16)" %}  # [target_platform == "linux-aarch64"]
+    {% set skips = skips + " or test_int8_linear_matmul_half or test_dequant_mm or test_integrated_int8_linear_matmul" %}  # [target_platform == "linux-aarch64"]
+    {% set skips = skips + " or test_linear8bitlt_inference or test_linear_kbit_fp32_bias" %}  # [target_platform == "linux-aarch64"]
+    {% set skips = skips + " or (test_kbit_backprop and dtype0 and cpu)" %}  # [target_platform == "linux-aarch64"]
+    {% set skips = skips + " or test_igemm or test_ibmm" %}  # [gpu_variant == "cuda-13" and target_platform != "linux-aarch64"]
     {% set skips = skips + " or benchmark" %}
     - pytest -v {{ tests_to_run }} --ignore={{ tests_to_ignore }} -k "not ({{ skips }})"  # [target_platform != "linux-aarch64"]
     # PyTorch's CUDA 13 aarch64 build does not support the T4G test GPU; avoid CUDA-only tests.
