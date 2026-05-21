@@ -5,11 +5,16 @@ setlocal enabledelayedexpansion
 :: but we always need the generic "cpu" backend even for CUDA-enabled builds or import will fail
 :: if in an environment with CUDA but without a GPU
 
+set BNB_OPENMP_FLAGS=
+if "%openmp_impl%"=="intel-openmp" (
+    set BNB_OPENMP_FLAGS=-DOpenMP_C_FLAGS=/openmp:llvm -DOpenMP_CXX_FLAGS=/openmp:llvm -DOpenMP_C_LIB_NAMES=libiomp5md -DOpenMP_CXX_LIB_NAMES=libiomp5md -DOpenMP_libiomp5md_LIBRARY=%LIBRARY_LIB%\libiomp5md.lib
+)
+
 :: Build the generic "cpu" backend
 :: this will create libbitsandbytes_cpu.dll in the bitsandbytes folder
 mkdir build\cpu
 pushd build\cpu
-cmake %CMAKE_ARGS% -DCOMPUTE_BACKEND=cpu -GNinja ..\..
+cmake %CMAKE_ARGS% %BNB_OPENMP_FLAGS% -DCOMPUTE_BACKEND=cpu -GNinja ..\..
 if errorlevel 1 exit 1
 ninja
 if errorlevel 1 exit 1
@@ -24,7 +29,7 @@ if "%cuda_compiler_version:~0,2%"=="13" set "COMPUTE_CAPABILITY=75;80;86;89;90;1
 if not "%cuda_compiler_version%"=="None" (
     mkdir build\cuda
     pushd build\cuda
-    cmake %CMAKE_ARGS% -DCOMPUTE_BACKEND=cuda -DCOMPUTE_CAPABILITY="!COMPUTE_CAPABILITY!" -GNinja ..\..
+    cmake %CMAKE_ARGS% %BNB_OPENMP_FLAGS% -DCOMPUTE_BACKEND=cuda -DCOMPUTE_CAPABILITY="!COMPUTE_CAPABILITY!" -GNinja ..\..
     if errorlevel 1 exit 1
     ninja
     if errorlevel 1 exit 1

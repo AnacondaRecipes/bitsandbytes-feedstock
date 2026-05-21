@@ -14,13 +14,16 @@ source:
     - patches/0002-allow-setting-CMAKE_OSX_DEPLOYMENT_TARGET.patch  # [osx]
 
 build:
-  number: 3
-  string: cuda{{ cuda_compiler_version | replace('.', '') }}_py{{ CONDA_PY }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version != "None"]
-  string: cpu_py{{ CONDA_PY }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version == "None"]
-  string: gpu_mps_py{{ CONDA_PY }}h{{PKG_HASH}}_{{ PKG_BUILDNUM }}  # [gpu_variant == "metal"]
+  number: 4
+  string: cuda{{ cuda_compiler_version | replace('.', '') }}_{{ openmp_impl | replace('-', '_') }}_py{{ CONDA_PY }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version != "None"]
+  string: cpu_{{ openmp_impl | replace('-', '_') }}_py{{ CONDA_PY }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version == "None"]
+  string: gpu_mps_{{ openmp_impl | replace('-', '_') }}_py{{ CONDA_PY }}h{{PKG_HASH}}_{{ PKG_BUILDNUM }}  # [gpu_variant == "metal"]
   skip: true  # [py<310]
   skip: true  # [py!=312]
   skip: true  # [unix]
+  # PyTorch GPU packages do not currently expose a vcomp-compatible build
+  # selector, so keep CUDA variants aligned to the Intel OpenMP PyTorch stack.
+  skip: true  # [win and (gpu_variant or "").startswith("cuda") and openmp_impl != "intel-openmp"]
   missing_dso_whitelist:  # [osx]
     - '*/libomp.dylib'    # [osx]
 
@@ -43,15 +46,20 @@ requirements:
     - scikit-build-core
     - setuptools >=77.0.3
     - trove-classifiers >=2025.8.6.13
-    - libgomp        # [linux]
+    - libgomp        # [openmp_impl == "libgomp"]
+    - llvm-openmp    # [openmp_impl == "llvm-openmp"]
+    - vcomp14        # [openmp_impl == "vcomp"]
+    - intel-openmp   # [openmp_impl == "intel-openmp"]
   run:
-    - libgomp        # [linux]
-    - llvm-openmp    # [osx or (win and arm64)]
-    - vcomp14        # [win and x86_64]
+    - libgomp        # [openmp_impl == "libgomp"]
+    - llvm-openmp    # [openmp_impl == "llvm-openmp"]
+    - vcomp14        # [openmp_impl == "vcomp"]
+    - intel-openmp   # [openmp_impl == "intel-openmp"]
     - packaging >=20.9
     - python
-    - pytorch >=2.3,<3             # [gpu_variant == "None"]
-    - pytorch-gpu >=2.3,<3 *cuda{{ cuda_compiler_version | replace('.', '') }}*  # [(gpu_variant or "").startswith("cuda")]
+    - pytorch >=2.3,<3 *openblas*  # [gpu_variant == "None" and openmp_impl != "intel-openmp"]
+    - pytorch >=2.3,<3 *mkl*       # [gpu_variant == "None" and openmp_impl == "intel-openmp"]
+    - pytorch-gpu >=2.3,<3 *cuda{{ cuda_compiler_version | replace('.', '') }}*  # [(gpu_variant or "").startswith("cuda") and openmp_impl == "intel-openmp"]
     - pytorch-gpu >=2.3,<3 *gpu_mps*  # [gpu_variant == "metal"]
     - numpy >=1.17
     # On macOS, the GPU accelerated backend, MPS, can be used from macOS v12.3. This isn't tightly dependent on the
