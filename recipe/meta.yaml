@@ -14,13 +14,11 @@ source:
     - patches/0002-allow-setting-CMAKE_OSX_DEPLOYMENT_TARGET.patch  # [osx]
 
 build:
-  number: 4
+  number: 2
   string: cuda{{ cuda_compiler_version | replace('.', '') }}_{{ openmp_impl | replace('-', '_') }}_py{{ CONDA_PY }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version != "None"]
   string: cpu_{{ openmp_impl | replace('-', '_') }}_py{{ CONDA_PY }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version == "None"]
   string: gpu_mps_{{ openmp_impl | replace('-', '_') }}_py{{ CONDA_PY }}h{{PKG_HASH}}_{{ PKG_BUILDNUM }}  # [gpu_variant == "metal"]
   skip: true  # [py<310]
-  skip: true  # [py!=312]
-  skip: true  # [unix]
   # PyTorch GPU packages do not currently expose a vcomp-compatible build
   # selector, so keep CUDA variants aligned to the Intel OpenMP PyTorch stack.
   skip: true  # [win and (gpu_variant or "").startswith("cuda") and openmp_impl != "intel-openmp"]
