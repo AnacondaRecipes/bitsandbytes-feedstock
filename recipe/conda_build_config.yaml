@@ -13,7 +13,7 @@ openmp_impl:
   - libgomp                    # [linux]
   - llvm-openmp                # [osx or (win and arm64)]
   - vcomp                      # [win and x86_64]
-  - intel-openmp               # [win and x86_64]
+  - intel-openmp               # [x86_64]
 
 zip_keys:                      # [win or linux]
   -                            # [win or linux]

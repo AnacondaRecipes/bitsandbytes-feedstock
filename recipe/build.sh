@@ -12,11 +12,16 @@ fi
 # but we always need the generic "cpu" backend even for CUDA-enabled builds or import will fail
 # if in an environment with CUDA but without a GPU
 
+BNB_OPENMP_FLAGS=
+if [[ "${openmp_impl}" == "intel-openmp" ]]; then
+    BNB_OPENMP_FLAGS="-DOpenMP_CXX_FLAGS=-fopenmp -DOpenMP_CXX_LIB_NAMES=iomp5 -DOpenMP_iomp5_LIBRARY=${PREFIX}/lib/libiomp5.so"
+fi
+
 # Build the generic "cpu" backend
 # this will create libbitsandbytes_cpu.so in the the bitsandbytes folder
 mkdir -p build/cpu
 pushd build/cpu
-cmake ${CMAKE_ARGS} -DCOMPUTE_BACKEND=cpu -GNinja ../..
+cmake ${CMAKE_ARGS} ${BNB_OPENMP_FLAGS} -DCOMPUTE_BACKEND=cpu -GNinja ../..
 ninja
 popd
 
@@ -42,7 +47,7 @@ if [[ "${cuda_compiler_version:-None}" != "None" ]]; then
 
   mkdir -p build/cuda
   pushd build/cuda
-  cmake ${CMAKE_ARGS} -DCOMPUTE_BACKEND=cuda -DCOMPUTE_CAPABILITY="${compute_capability}" -GNinja ../..
+  cmake ${CMAKE_ARGS} ${BNB_OPENMP_FLAGS} -DCOMPUTE_BACKEND=cuda -DCOMPUTE_CAPABILITY="${compute_capability}" -GNinja ../..
   ninja
   popd
 fi

@@ -21,7 +21,7 @@ build:
   skip: true  # [py<310]
   # PyTorch GPU packages do not currently expose a vcomp-compatible build
   # selector, so keep CUDA variants aligned to the Intel OpenMP PyTorch stack.
-  skip: true  # [win and (gpu_variant or "").startswith("cuda") and openmp_impl != "intel-openmp"]
+  skip: true  # [(gpu_variant or "").startswith("cuda") and openmp_impl != "intel-openmp"]
   missing_dso_whitelist:  # [osx]
     - '*/libomp.dylib'    # [osx]
 
@@ -74,6 +74,8 @@ test:
   source_files:
     - tests/
     - check_bnb_install.py
+  files:
+    - test-openmp.sh  # [linux]
   requires:
     - pip
     ## Missing lion-pytorch
@@ -91,6 +93,9 @@ test:
     # vcomp OpenMP CPU 4-bit GEMV tests are nondeterministic/fail with multiple threads.
     # Force single-threaded test execution to avoid a known vcomp threading issue.
     - set OMP_NUM_THREADS=1  # [win and openmp_impl == "vcomp"]
+
+    - bash test-openmp.sh intel-openmp  # [linux and openmp_impl == "intel-openmp"]
+    - bash test-openmp.sh libgomp  # [linux and openmp_impl == "libgomp"]
     
     # Verify library can load and find binaries (CUDA only - script hardcodes .cuda() calls)
     # Unable to run on NVIDIA T4G with CUDA capability sm_75 which is what PBP has.
