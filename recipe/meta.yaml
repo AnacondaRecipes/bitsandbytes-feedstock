@@ -87,6 +87,11 @@ test:
 
   commands:
     - pip check
+
+    # vcomp OpenMP CPU 4-bit GEMV tests are nondeterministic/fail with multiple threads.
+    # Force single-threaded test execution to avoid a known vcomp threading issue.
+    - set OMP_NUM_THREADS=1  # [win and openmp_impl == "vcomp"]
+    
     # Verify library can load and find binaries (CUDA only - script hardcodes .cuda() calls)
     # Unable to run on NVIDIA T4G with CUDA capability sm_75 which is what PBP has.
     - python check_bnb_install.py  # [cuda_compiler_version != "None" and target_platform != "linux-aarch64"]
