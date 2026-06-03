@@ -9,6 +9,12 @@ cuda_compiler_version:
   - 12.9                       # [win or (linux and x86_64)]
   - 13.0                       # [win or linux]
 
+openmp_impl:
+  - libgomp                    # [linux]
+  - llvm-openmp                # [osx or (win and arm64)]
+  - vcomp                      # [win and x86_64]
+  - intel-openmp               # [x86_64]
+
 zip_keys:                      # [win or linux]
   -                            # [win or linux]
     - gpu_variant              # [win or linux]
