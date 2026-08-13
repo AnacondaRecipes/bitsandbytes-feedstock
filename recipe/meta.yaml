@@ -10,8 +10,7 @@ source:
   url: https://github.com/bitsandbytes-foundation/bitsandbytes/archive/refs/tags/{{ version }}.tar.gz
   sha256: 6d3820f5f235dbd4859cc7f34998ec792f3fc92e4cb93ec981b1fdc53dd54826
   patches:
-    - patches/0001-fix-metal-paths.patch  # [osx]
-    - patches/0002-allow-setting-CMAKE_OSX_DEPLOYMENT_TARGET.patch  # [osx]
+    - patches/0001-allow-setting-CMAKE_OSX_DEPLOYMENT_TARGET.patch  # [osx]
 
 build:
   number: 0
