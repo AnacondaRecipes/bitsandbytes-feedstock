@@ -1,5 +1,5 @@
 {% set name = "bitsandbytes" %}
-{% set version = "0.50.0" %}
+{% set version = "0.50.1" %}
 
 package:
   name: {{ name }}
@@ -7,8 +7,8 @@ package:
 
 source:
   # Don't use the PyPI source tarball as this already contains compiled code.
-  url: https://github.com/bitsandbytes-foundation/bitsandbytes/archive/refs/tags/{{ version }}.tar.gz
-  sha256: 6d3820f5f235dbd4859cc7f34998ec792f3fc92e4cb93ec981b1fdc53dd54826
+  url: https://github.com/{{ name }}-foundation/{{ name }}/archive/refs/tags/{{ version }}.tar.gz
+  sha256: 8537f8e2e9f946fac624803903e26b23750cb6d1520441d259428ad32723af93
   patches:
     - patches/0001-allow-setting-CMAKE_OSX_DEPLOYMENT_TARGET.patch  # [osx]
 
@@ -33,9 +33,13 @@ requirements:
     - cmake
     - ninja-base
     - make  # [unix]
+    - libgomp        # [openmp_impl == "libgomp"]
+    - llvm-openmp    # [openmp_impl == "llvm-openmp"]
+    - vcomp14        # [openmp_impl == "vcomp"]
+    - intel-openmp   # [openmp_impl == "intel-openmp"]
   host:
-    - python
     - pip
+    - python
     - cuda-cudart-dev   # [cuda_compiler_version != "None"]
     - libcublas-dev     # [cuda_compiler_version != "None"]
     - libcusparse-dev   # [cuda_compiler_version != "None"]
@@ -71,7 +75,7 @@ test:
     - bitsandbytes.nn
     - bitsandbytes.optim
   source_files:
-    - tests/
+    - tests
     - check_bnb_install.py
   files:
     - test-openmp.sh  # [linux]
