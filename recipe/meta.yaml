@@ -58,10 +58,10 @@ requirements:
     - intel-openmp   # [openmp_impl == "intel-openmp"]
     - packaging >=20.9
     - python
-    - pytorch >=2.3,<3 *openblas*  # [gpu_variant == "None" and openmp_impl != "intel-openmp"]
-    - pytorch >=2.3,<3 *mkl*       # [gpu_variant == "None" and openmp_impl == "intel-openmp"]
-    - pytorch >=2.3,<3 *gpu_cuda{{ cuda_compiler_version | replace('.', '') }}*  # [(gpu_variant or "").startswith("cuda")]
-    - pytorch-gpu >=2.3,<3 *gpu_mps*  # [gpu_variant == "metal"]
+    - pytorch >=2.4,<3 *openblas*  # [gpu_variant == "None" and openmp_impl != "intel-openmp"]
+    - pytorch >=2.4,<3 *mkl*       # [gpu_variant == "None" and openmp_impl == "intel-openmp"]
+    - pytorch >=2.4,<3 *gpu_cuda{{ cuda_compiler_version | replace('.', '') }}*  # [(gpu_variant or "").startswith("cuda")]
+    - pytorch-gpu >=2.4,<3 *gpu_mps*  # [gpu_variant == "metal"]
     - numpy >=1.17
     # On macOS, the GPU accelerated backend, MPS, can be used from macOS v12.3. This isn't tightly dependent on the
     # SDK version used.
