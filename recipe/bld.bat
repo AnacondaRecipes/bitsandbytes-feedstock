@@ -5,9 +5,14 @@ setlocal enabledelayedexpansion
 :: but we always need the generic "cpu" backend even for CUDA-enabled builds or import will fail
 :: if in an environment with CUDA but without a GPU
 
+:: Fix: MSVC's /openmp:llvm alone rejects `#pragma omp simd` (error C7660).
+:: /openmp:experimental adds SIMD-pragma support; keeping /openmp:llvm too
+:: preserves codegen compatible with the Intel/LLVM runtime (libiomp5md).
+:: Combining both is the documented MS workaround (yields a harmless
+:: C4005 "macro redefinition" warning, not an error).
 set BNB_OPENMP_FLAGS=
 if "%openmp_impl%"=="intel-openmp" (
-    set BNB_OPENMP_FLAGS=-DOpenMP_C_FLAGS=/openmp:llvm -DOpenMP_CXX_FLAGS=/openmp:llvm -DOpenMP_C_LIB_NAMES=libiomp5md -DOpenMP_CXX_LIB_NAMES=libiomp5md -DOpenMP_libiomp5md_LIBRARY=%LIBRARY_LIB%\libiomp5md.lib
+    set BNB_OPENMP_FLAGS=-DOpenMP_C_FLAGS="/openmp:llvm /openmp:experimental" -DOpenMP_CXX_FLAGS="/openmp:llvm /openmp:experimental" -DOpenMP_C_LIB_NAMES=libiomp5md -DOpenMP_CXX_LIB_NAMES=libiomp5md -DOpenMP_libiomp5md_LIBRARY=%LIBRARY_LIB%\libiomp5md.lib
 )
 
 :: Build the generic "cpu" backend
