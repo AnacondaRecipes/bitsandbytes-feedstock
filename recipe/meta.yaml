@@ -1,5 +1,31 @@
 {% set name = "bitsandbytes" %}
-{% set version = "0.50.1" %}
+{% set version = "0.50.2" %}
+{% set tests_to_run = "tests/test_generation.py tests/test_modules.py tests/test_autograd.py tests/test_functional.py" %}
+{% set tests_to_run = "tests/test_modules.py tests/test_autograd.py tests/test_functional.py" %}  # [target_platform == "linux-aarch64"]
+{% set tests_to_ignore = "tests/test_optim.py" %}
+{% set tests_to_ignore = "tests/test_optim.py" %}
+{% set skips = "test_4bit_quant" %}
+{% set skips = skips + " or test_4bit_linear_warnings" %}
+{% set skips = 'skips + " or (test_matmullt and bf16 and cpu)"' %}
+{% set skips = skips + " or test_int8_double_quant" %}  # [target_platform == "linux-aarch64"]
+{% set skips = 'skips + " or (cpu and fp16)"' %}  # [target_platform == "linux-aarch64"]
+{% set skips = skips + " or test_int8_linear_matmul_half or test_dequant_mm or test_integrated_int8_linear_matmul" %}  # [target_platform == "linux-aarch64"]
+{% set skips = skips + " or test_linear8bitlt_inference or test_linear_kbit_fp32_bias" %}  # [target_platform == "linux-aarch64"]
+{% set skips = 'skips + " or (test_kbit_backprop and dtype0 and cpu)"' %}  # [target_platform == "linux-aarch64"]
+{% set skips = skips + " or test_igemm or test_ibmm" %}  # [gpu_variant == "cuda-13" and target_platform != "linux-aarch64"]
+{% set skips = skips + " or benchmark" %}
+{% set skips = "test_4bit_quant" %}
+{% set skips = skips + " or test_4bit_linear_warnings" %}
+{% set skips = 'skips + " or (test_matmullt and bf16 and cpu)"' %}
+{% set skips = skips + " or test_int8_double_quant" %}  # [target_platform == "linux-aarch64"]
+{% set skips = 'skips + " or (cpu and fp16)"' %}  # [target_platform == "linux-aarch64"]
+{% set skips = skips + " or test_int8_linear_matmul_half or test_dequant_mm or test_integrated_int8_linear_matmul" %}  # [target_platform == "linux-aarch64"]
+{% set skips = skips + " or test_linear8bitlt_inference or test_linear_kbit_fp32_bias" %}  # [target_platform == "linux-aarch64"]
+{% set skips = 'skips + " or (test_kbit_backprop and dtype0 and cpu)"' %}  # [target_platform == "linux-aarch64"]
+{% set skips = skips + " or test_igemm or test_ibmm" %}  # [gpu_variant == "cuda-13" and target_platform != "linux-aarch64"]
+{% set skips = skips + " or benchmark" %}
+{% set skips = 'skips + " or (test_matmul_4bit and bf16 and cpu)"' %}  # [osx]
+{% set skips = skips + " or test_matmul_4bit_weight_orientation" %}  # [unix]
 
 package:
   name: {{ name }}
@@ -8,7 +34,7 @@ package:
 source:
   # Don't use the PyPI source tarball as this already contains compiled code.
   url: https://github.com/{{ name }}-foundation/{{ name }}/archive/refs/tags/{{ version }}.tar.gz
-  sha256: 8537f8e2e9f946fac624803903e26b23750cb6d1520441d259428ad32723af93
+  sha256: baecd40b01500b4f7f60a926544bbb315a2123eedbff5f72c38ba01611203385
   patches:
     - patches/0001-allow-setting-CMAKE_OSX_DEPLOYMENT_TARGET.patch  # [osx]
 
@@ -22,7 +48,7 @@ build:
   # selector, so keep CUDA variants aligned to the Intel OpenMP PyTorch stack.
   skip: true  # [(gpu_variant or "").startswith("cuda") and openmp_impl != "intel-openmp"]
   missing_dso_whitelist:  # [osx]
-    - '*/libomp.dylib'    # [osx]
+    - "*/libomp.dylib"  # [osx]
 
 requirements:
   build:
@@ -33,43 +59,41 @@ requirements:
     - cmake
     - ninja-base
     - make  # [unix]
-    - libgomp        # [openmp_impl == "libgomp"]
-    - llvm-openmp    # [openmp_impl == "llvm-openmp"]
-    - vcomp14        # [openmp_impl == "vcomp"]
-    - intel-openmp   # [openmp_impl == "intel-openmp"]
+    - libgomp  # [openmp_impl == "libgomp"]
+    - llvm-openmp  # [openmp_impl == "llvm-openmp"]
+    - vcomp14  # [openmp_impl == "vcomp"]
+    - intel-openmp  # [openmp_impl == "intel-openmp"]
   host:
     - pip
     - python
-    - cuda-cudart-dev   # [cuda_compiler_version != "None"]
-    - libcublas-dev     # [cuda_compiler_version != "None"]
-    - libcusparse-dev   # [cuda_compiler_version != "None"]
+    - cuda-cudart-dev  # [cuda_compiler_version != "None"]
+    - libcublas-dev  # [cuda_compiler_version != "None"]
+    - libcusparse-dev  # [cuda_compiler_version != "None"]
     - cuda-version  {{ cuda_compiler_version }}  # [cuda_compiler_version != "None"]
     - scikit-build-core
-    - setuptools >=77.0.3
     - trove-classifiers >=2025.8.6.13
-    - libgomp        # [openmp_impl == "libgomp"]
-    - llvm-openmp    # [openmp_impl == "llvm-openmp"]
-    - vcomp14        # [openmp_impl == "vcomp"]
-    - intel-openmp   # [openmp_impl == "intel-openmp"]
+    - libgomp  # [openmp_impl == "libgomp"]
+    - llvm-openmp  # [openmp_impl == "llvm-openmp"]
+    - vcomp14  # [openmp_impl == "vcomp"]
+    - intel-openmp  # [openmp_impl == "intel-openmp"]
+    - setuptools >=77.0.3
   run:
-    - libgomp        # [openmp_impl == "libgomp"]
-    - llvm-openmp    # [openmp_impl == "llvm-openmp"]
-    - vcomp14        # [openmp_impl == "vcomp"]
-    - intel-openmp   # [openmp_impl == "intel-openmp"]
+    - libgomp  # [openmp_impl == "libgomp"]
+    - llvm-openmp  # [openmp_impl == "llvm-openmp"]
+    - vcomp14  # [openmp_impl == "vcomp"]
+    - intel-openmp  # [openmp_impl == "intel-openmp"]
     - packaging >=20.9
     - python
     - pytorch >=2.4,<3 *openblas*  # [gpu_variant == "None" and openmp_impl != "intel-openmp"]
-    - pytorch >=2.4,<3 *mkl*       # [gpu_variant == "None" and openmp_impl == "intel-openmp"]
+    - pytorch >=2.4,<3 *mkl*  # [gpu_variant == "None" and openmp_impl == "intel-openmp"]
     - pytorch >=2.4,<3 *gpu_cuda{{ cuda_compiler_version | replace('.', '') }}*  # [(gpu_variant or "").startswith("cuda")]
     - pytorch-gpu >=2.4,<3 *gpu_mps*  # [gpu_variant == "metal"]
     - numpy >=1.17
     # On macOS, the GPU accelerated backend, MPS, can be used from macOS v12.3. This isn't tightly dependent on the
     # SDK version used.
     - __osx >=12.3  # [gpu_variant == "metal"]
-    - __cuda        # [(gpu_variant or "").startswith("cuda")] 
+    - __cuda  # [(gpu_variant or "").startswith("cuda")]
     - cuda-version  {{ cuda_compiler_version }}  # [cuda_compiler_version != "None"]
-
-
 
 test:
   imports:
@@ -91,61 +115,28 @@ test:
     - transformers >=4.30.1,<5  # [py<314]
     #  ImportError: Using `low_cpu_mem_usage=True` or a `device_map` requires Accelerate: `pip install 'accelerate>=0.26.0'`
     - huggingface_accelerate >=0.26.0
-
   commands:
     - pip check
-
     # vcomp OpenMP CPU 4-bit GEMV tests are nondeterministic/fail with multiple threads.
     # Force single-threaded test execution to avoid a known vcomp threading issue.
     - set OMP_NUM_THREADS=1  # [win and openmp_impl == "vcomp"]
-
     - bash test-openmp.sh intel-openmp  # [linux and openmp_impl == "intel-openmp"]
     - bash test-openmp.sh libgomp  # [linux and openmp_impl == "libgomp"]
-    
     # Verify library can load and find binaries (CUDA only - script hardcodes .cuda() calls)
     # Unable to run on NVIDIA T4G with CUDA capability sm_75 which is what PBP has.
     - python check_bnb_install.py  # [cuda_compiler_version != "None" and target_platform != "linux-aarch64"]
     # Keep tests focused: test_optim needs lion-pytorch; skip known MPS/CPU bf16,
     # brittle warning-count, and benchmark failures.
-    {% set tests_to_run = "tests/test_generation.py tests/test_modules.py tests/test_autograd.py tests/test_functional.py" %}
-    {% set tests_to_run = "tests/test_modules.py tests/test_autograd.py tests/test_functional.py" %}  # [target_platform == "linux-aarch64"]
-    {% set tests_to_ignore = "tests/test_optim.py" %}
-    {% set skips = "test_4bit_quant" %}
-    {% set skips = skips + " or test_4bit_linear_warnings" %}
-    {% set skips = skips + " or (test_matmullt and bf16 and cpu)" %}
-    {% set skips = skips + " or test_int8_double_quant" %}  # [target_platform == "linux-aarch64"]
-    {% set skips = skips + " or (cpu and fp16)" %}  # [target_platform == "linux-aarch64"]
-    {% set skips = skips + " or test_int8_linear_matmul_half or test_dequant_mm or test_integrated_int8_linear_matmul" %}  # [target_platform == "linux-aarch64"]
-    {% set skips = skips + " or test_linear8bitlt_inference or test_linear_kbit_fp32_bias" %}  # [target_platform == "linux-aarch64"]
-    {% set skips = skips + " or (test_kbit_backprop and dtype0 and cpu)" %}  # [target_platform == "linux-aarch64"]
-    {% set skips = skips + " or test_igemm or test_ibmm" %}  # [gpu_variant == "cuda-13" and target_platform != "linux-aarch64"]
-    {% set skips = skips + " or benchmark" %}
     # Fix: two known-broken CPU-only test paths, consistent with the recipe's
     # existing pattern of skipping known-brittle CPU combos rather than patching
     # upstream source or test files.
-    {% set tests_to_ignore = "tests/test_optim.py" %}
-    {% set skips = "test_4bit_quant" %}
-    {% set skips = skips + " or test_4bit_linear_warnings" %}
-    {% set skips = skips + " or (test_matmullt and bf16 and cpu)" %}
-    {% set skips = skips + " or test_int8_double_quant" %}  # [target_platform == "linux-aarch64"]
-    {% set skips = skips + " or (cpu and fp16)" %}  # [target_platform == "linux-aarch64"]
-    {% set skips = skips + " or test_int8_linear_matmul_half or test_dequant_mm or test_integrated_int8_linear_matmul" %}  # [target_platform == "linux-aarch64"]
-    {% set skips = skips + " or test_linear8bitlt_inference or test_linear_kbit_fp32_bias" %}  # [target_platform == "linux-aarch64"]
-    {% set skips = skips + " or (test_kbit_backprop and dtype0 and cpu)" %}  # [target_platform == "linux-aarch64"]
-    {% set skips = skips + " or test_igemm or test_ibmm" %}  # [gpu_variant == "cuda-13" and target_platform != "linux-aarch64"]
-    {% set skips = skips + " or benchmark" %}
     # bf16 4-bit CPU matmul with bias returns NaN (upstream CPU kernel bug,
     # reproduces on every N/K/blocksize/quant_type combination shown in CI logs).
-    {% set skips = skips + " or (test_matmul_4bit and bf16 and cpu)" %}  # [osx]
     # test hardcodes torch.float16; oneDNN on this CPU can't build an fp16
     # matmul primitive (missing avx512-fp16), unrelated to bitsandbytes itself.
-    {% set skips = skips + " or test_matmul_4bit_weight_orientation" %}  # [unix]
     - pytest -v {{ tests_to_run }} --ignore={{ tests_to_ignore }} -k "not ({{ skips }})"  # [target_platform != "linux-aarch64"]
     # PyTorch's CUDA 13 aarch64 build does not support the T4G test GPU; avoid CUDA-only tests.
     - CUDA_VISIBLE_DEVICES="" BNB_TEST_DEVICE=cpu pytest -v {{ tests_to_run }} --ignore={{ tests_to_ignore }} -k "not ({{ skips }})"  # [target_platform == "linux-aarch64"]
-
-
-
 
 about:
   home: https://github.com/bitsandbytes-foundation/bitsandbytes
