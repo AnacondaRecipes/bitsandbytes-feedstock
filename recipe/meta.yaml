@@ -86,7 +86,9 @@ test:
     # - lion-pytorch ==0.2.3
     - pytest >=8.3,<9
     - scipy >=1.11.4,<2
-    - transformers >=4.30.1,<5  # [py<314]
+    - transformers >=4.30.1,<5  # [py<314 and not (win and arm64)]
+    # win-arm64 channel has no transformers <5 build; use the oldest available instead.
+    - transformers >=5.20.1  # [py<314 and win and arm64]
     #  ImportError: Using `low_cpu_mem_usage=True` or a `device_map` requires Accelerate: `pip install 'accelerate>=0.26.0'`
     - huggingface_accelerate >=0.26.0
   commands:
