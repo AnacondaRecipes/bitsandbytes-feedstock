@@ -13,14 +13,16 @@ source:
     - patches/0001-allow-setting-CMAKE_OSX_DEPLOYMENT_TARGET.patch  # [osx]
 
 build:
-  number: 0
+  number: 1
   string: cuda{{ cuda_compiler_version | replace('.', '') }}_{{ openmp_impl | replace('-', '_') }}_py{{ CONDA_PY }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version != "None"]
   string: cpu_{{ openmp_impl | replace('-', '_') }}_py{{ CONDA_PY }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version == "None"]
   string: gpu_mps_{{ openmp_impl | replace('-', '_') }}_py{{ CONDA_PY }}h{{PKG_HASH}}_{{ PKG_BUILDNUM }}  # [gpu_variant == "metal"]
   skip: true  # [py<310]
-  # PyTorch GPU packages do not currently expose a vcomp-compatible build
-  # selector, so keep CUDA variants aligned to the Intel OpenMP PyTorch stack.
-  skip: true  # [(gpu_variant or "").startswith("cuda") and openmp_impl != "intel-openmp"]
+  # Keep Windows CUDA variants on the Intel OpenMP PyTorch stack. In particular,
+  # vcomp14 requires _openmp_mutex=*=*_msvc, whereas win-64 PyTorch CUDA builds
+  # require *_intel (MKL) or *_llvm (OpenBLAS). Linux also has libgomp-compatible
+  # PyTorch CUDA builds, so do not apply this restriction there.
+  skip: true  # [win and (gpu_variant or "").startswith("cuda") and openmp_impl != "intel-openmp"]
   missing_dso_whitelist:  # [osx]
     - "*/libomp.dylib"  # [osx]
 
